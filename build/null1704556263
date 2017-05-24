@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.7
+Created-By: 1.8.0_121-b13 (Oracle Corporation)
+Trusted-Library: true
+Codebase: C:\$user\tanada\pessoal\Mestrado\IA941A\DemoLIDA\dist
+Application-Library-Allowable-Codebase: C:\$user\tanada\pessoal\Mestra
+ do\IA941A\DemoLIDA\dist
+Caller-Allowable-Codebase: C:\$user\tanada\pessoal\Mestrado\IA941A\Dem
+ oLIDA\dist
+Permissions: all-permissions
+Application-Name: DemoLIDA
+
