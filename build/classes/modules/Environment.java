@@ -5,6 +5,7 @@ import edu.memphis.ccrg.lida.framework.tasks.FrameworkTaskImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import ws3dproxy.CommandUtility;
 import ws3dproxy.WS3DProxy;
 import ws3dproxy.model.Creature;
 import ws3dproxy.model.Leaflet;
@@ -23,6 +24,12 @@ public class Environment extends EnvironmentImpl {
     private List<Thing> thingAhead;
     private Thing leafletJewel;
     private String currentAction;   
+    
+    // FMT 2017
+    private double dCellSize = 30;
+    private double dBoardXSize = 800;
+    private double dBoardYSize = 600;
+    private String sBoardMap;
     
     public Environment() {
         this.ticksPerRun = DEFAULT_TICKS_PER_RUN;
@@ -48,6 +55,15 @@ public class Environment extends EnvironmentImpl {
             creature.start();
             System.out.println("Starting the WS3D Resource Generator ... ");
             World.grow(1);
+            
+            // FMT 01/06/2017 Create Simulation Enviroment - walls
+            // not works CommandUtility.sendNewBrick(4,119.0,5.0,142.0,199.0);
+            CommandUtility.sendNewBrick(4,144.0,608.0,520.0,622.0);
+            CommandUtility.sendNewBrick(4,302.0,408.0,469.0,479.0);
+            CommandUtility.sendNewBrick(4,13.0,224.0,87.0,234.0);   
+            CommandUtility.sendNewBrick(4,107.0,306.0,228.0,334.0);   
+            CommandUtility.sendNewBrick(4,318.0,149.0,347.0,357.0);   
+            
             Thread.sleep(4000);
             creature.updateState();
             System.out.println("DemoLIDA has started...");
@@ -97,15 +113,60 @@ public class Environment extends EnvironmentImpl {
         return requestedObject;
     }
 
+    public boolean isInsideCell(Thing tThing, int x, int y)
+    {
+       Boolean bRet = false;
+       double x1 = tThing.getX1();
+       double x2 = tThing.getX2();
+       double y1 = tThing.getY1();
+       double y2 = tThing.getY2();
+       if ((x > x1) && (x < x2) && (y > y1) && (y < y2))
+         bRet = true;
+       return(bRet);
+    }
+    /**
+     *
+     * @param tThings
+     * @return
+     * Function to map the board - blank spaces vs cells with things
+     */
+    public String boardMapper(List<Thing> tThings)
+    {
+      String sMap;
+      String sAux;
+      
+      sMap = "";
+      int xPos = (int) Math.ceil(dBoardXSize/dCellSize);
+      int yPos = (int) Math.ceil(dBoardXSize/dCellSize);
+      for (int i = 1; i <= yPos; i++)
+      {
+          for (int j = 1; j <= xPos; j++)
+          {
+            sAux = "-";
+            for (Thing thing: tThings)
+            {
+                if (isInsideCell(thing, j, i))
+                    sAux = "X";
+            }
+            sMap += sAux;
+          }
+      }
+      return(sMap);
+    }
     
-    public void updateEnvironment() {
+    public void updateEnvironment() 
+    {
+        List<Thing> lThings;
         creature.updateState();
         food = null;
         jewel = null;
         leafletJewel = null;
         thingAhead.clear();
                 
-        for (Thing thing : creature.getThingsInVision()) {
+        lThings = creature.getThingsInVision();
+        sBoardMap = this.boardMapper(lThings);
+        for (Thing thing : lThings) 
+        {
             if (creature.calculateDistanceTo(thing) <= Constants.OFFSET) {
                 // Identifica o objeto proximo
                 thingAhead.add(thing);
@@ -160,6 +221,10 @@ public class Environment extends EnvironmentImpl {
                 case "gotoJewel":
                     if (leafletJewel != null)
                         creature.moveto(3.0, leafletJewel.getX1(), leafletJewel.getY1());
+                        //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, leafletJewel.getX1(), leafletJewel.getY1());
+                    break;                    
+                case "gotoDestination":
+                    creature.moveto(3.0, 450.0, 450.0);
                         //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, leafletJewel.getX1(), leafletJewel.getY1());
                     break;                    
                 case "get":

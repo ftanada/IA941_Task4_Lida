@@ -12,6 +12,7 @@ public class SensoryMemory extends SensoryMemoryImpl {
     private Map<String, Object> sensorParam;
     private Thing food;
     private Thing jewel;
+    private Thing wall;
     private List<Thing> thingAhead;
     private Thing leafletJewel;
 
@@ -19,6 +20,7 @@ public class SensoryMemory extends SensoryMemoryImpl {
         this.sensorParam = new HashMap<>();
         this.food = null;
         this.jewel = null;
+        this.wall = null;
         this.thingAhead = new ArrayList<>();
         this.leafletJewel = null;
     }
@@ -38,6 +40,11 @@ public class SensoryMemory extends SensoryMemoryImpl {
         sensorParam.clear();
         sensorParam.put("mode", "leafletJewel");
         leafletJewel = (Thing) environment.getState(sensorParam);
+        // FMT 01/06/2017
+        sensorParam.clear();
+        sensorParam.put("mode", "wall");
+        wall = (Thing) environment.getState(sensorParam);
+
     }
 
     @Override
@@ -56,6 +63,9 @@ public class SensoryMemory extends SensoryMemoryImpl {
                 break;
             case "leafletJewel":
                 requestedObject = leafletJewel;
+                break;
+            case "wall":
+                requestedObject = wall;
                 break;
             default:
                 break;
