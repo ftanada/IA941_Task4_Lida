@@ -14,7 +14,7 @@ public class JewelDetector extends BasicDetectionAlgorithm {
     @Override
     public void init() {
         super.init();
-        detectorParams.put("mode", "leafletJewel");
+        detectorParams.put("mode", "jewel");
     }
 
     @Override

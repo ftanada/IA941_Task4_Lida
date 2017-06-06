@@ -1,0 +1,315 @@
+package modules;
+
+import edu.memphis.ccrg.lida.environment.EnvironmentImpl;
+import edu.memphis.ccrg.lida.framework.tasks.FrameworkTaskImpl;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+import ws3dproxy.CommandUtility;
+import ws3dproxy.WS3DProxy;
+import ws3dproxy.model.Creature;
+import ws3dproxy.model.Leaflet;
+import ws3dproxy.model.Thing;
+import ws3dproxy.model.World;
+import ws3dproxy.model.WorldPoint;
+import ws3dproxy.util.Constants;
+
+public class Environment extends EnvironmentImpl 
+{
+   private static final Logger logger = Logger.getLogger(Environment.class.getCanonicalName());
+    
+    private static final int DEFAULT_TICKS_PER_RUN = 100;
+    private int ticksPerRun;
+    private WS3DProxy proxy;
+    private Creature creature;
+    private Thing food;
+    private Thing jewel;
+    private List<Thing> thingAhead;
+    private Thing leafletJewel;
+    private Thing wall;
+    private String currentAction;   
+    private double energy;
+    private Thing genericThing;
+    
+    // FMT 2017
+    private double dCellSize = 30;
+    private double dBoardXSize = 800;
+    private double dBoardYSize = 600;
+    private String sBoardMap;
+    private String sLastAction;
+    
+    public Environment() 
+    {
+        this.ticksPerRun = DEFAULT_TICKS_PER_RUN;
+        this.proxy = new WS3DProxy();
+        this.creature = null;
+        this.food = null;
+        this.jewel = null;
+        this.thingAhead = new ArrayList<>();
+        this.leafletJewel = null;
+        this.wall = null;
+        this.genericThing = null;
+        this.currentAction = "gotoDestination";
+        this.sLastAction = "";
+    }
+
+    @Override
+    public void init() {
+        super.init();
+        ticksPerRun = (Integer) getParam("environment.ticksPerRun", DEFAULT_TICKS_PER_RUN);
+        taskSpawner.addTask(new BackgroundTask(ticksPerRun));
+        
+        try {
+            System.out.println("Reseting the WS3D World ...");
+            proxy.getWorld().reset();
+            creature = proxy.createCreature(80, 80, 0);
+            creature.start();
+            System.out.println("Starting the WS3D Resource Generator ... ");
+            // FMT World.grow(1);
+            
+            // FMT 01/06/2017 Create Simulation Enviroment - walls
+            // not works CommandUtility.sendNewBrick(4,119.0,5.0,142.0,199.0);
+            CommandUtility.sendNewBrick(4,144.0,608.0,520.0,622.0);
+            CommandUtility.sendNewBrick(4,302.0,408.0,469.0,479.0);
+            CommandUtility.sendNewBrick(4,13.0,224.0,87.0,234.0);   
+            CommandUtility.sendNewBrick(4,107.0,306.0,228.0,334.0);   
+            CommandUtility.sendNewBrick(4,318.0,149.0,347.0,357.0);   
+            
+            Thread.sleep(4000);
+            creature.updateState();
+            System.out.println("DemoLIDA has started...");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class BackgroundTask extends FrameworkTaskImpl {
+
+        public BackgroundTask(int ticksPerRun) {
+            super(ticksPerRun);
+        }
+
+        @Override
+        protected void runThisFrameworkTask() {
+            updateEnvironment();
+            performAction(currentAction);
+        }
+    }
+
+    @Override
+    public void resetState() {
+        currentAction = "gotoDestination";
+    }
+
+    @Override
+    public Object getState(Map<String, ?> params) {
+        Object requestedObject = null;
+        String mode = (String) params.get("mode");
+        //System.out.println("getState: "+mode);
+        switch (mode) {
+            case "food":
+                requestedObject = food;
+                break;
+            case "jewel":
+                requestedObject = jewel;
+                break;
+            case "thingAhead":
+                requestedObject = thingAhead;
+                break;
+            case "leafletJewel":
+                requestedObject = leafletJewel;
+                break;
+            case "wall":
+                requestedObject = wall;
+                break;
+            case "energy":
+                requestedObject = energy;
+                break;
+            case "object":
+                requestedObject = genericThing;
+                break;
+            default:
+                break;
+        }
+        return requestedObject;
+    }
+
+    public boolean isInsideCell(Thing tThing, int x, int y)
+    {
+       Boolean bRet = false;
+       double x1 = tThing.getX1();
+       double x2 = tThing.getX2();
+       double y1 = tThing.getY1();
+       double y2 = tThing.getY2();
+       if ((x > x1) && (x < x2) && (y > y1) && (y < y2))
+         bRet = true;
+       return(bRet);
+    }
+    /**
+     *
+     * @param tThings
+     * @return
+     * Function to map the board - blank spaces vs cells with things
+     */
+    public String boardMapper(List<Thing> tThings)
+    {
+      String sMap;
+      String sAux;
+      
+      sMap = "";
+      int xPos = (int) Math.ceil(dBoardXSize/dCellSize);
+      int yPos = (int) Math.ceil(dBoardXSize/dCellSize);
+      for (int i = 1; i <= yPos; i++)
+      {
+          for (int j = 1; j <= xPos; j++)
+          {
+            sAux = "-";
+            for (Thing thing: tThings)
+            {
+                if (isInsideCell(thing, j, i))
+                    sAux = "X";
+            }
+            sMap += sAux;
+          }
+      }
+      return(sMap);
+    }
+    
+    public void updateEnvironment() 
+    {
+        List<Thing> lThings;
+        creature.updateState();
+        food = null;
+        jewel = null;
+        leafletJewel = null;
+        genericThing = null;
+        wall = null;
+        thingAhead.clear();
+                
+        energy = creature.getFuel();
+        // FMT System.out.println("updateEnvironment: "+energy);
+        lThings = creature.getThingsInVision();
+        sBoardMap = this.boardMapper(lThings);
+        for (Thing thing : lThings) 
+        {
+            if (creature.calculateDistanceTo(thing) <= Constants.OFFSET) {
+                // Identifica o objeto proximo
+                thingAhead.add(thing);
+                genericThing = thing;
+                System.out.println("updateEnvironment: found genericThing");
+                break;
+            } else if (thing.getCategory() == Constants.categoryJEWEL) 
+              {
+                if (leafletJewel == null) 
+                {
+                    // Identifica se a joia esta no leaflet
+                    for (Leaflet leaflet: creature.getLeaflets())                   
+                    {
+                        if (leaflet.ifInLeaflet(thing.getMaterial().getColorName()) &&
+                                leaflet.getTotalNumberOfType(thing.getMaterial().getColorName()) > leaflet.getCollectedNumberOfType(thing.getMaterial().getColorName()))
+                        {
+                            leafletJewel = thing;
+                            System.out.println("updateEnvironment: found leafletJewel");
+                            break;
+                        }
+                    }
+                } else 
+                  {
+                    // Identifica a joia que nao esta no leaflet
+                    jewel = thing;
+                    System.out.println("updateEnvironment: found leafletJewel");
+                  }
+            } else if (food == null && creature.getFuel() <= 300.0
+                        && (thing.getCategory() == Constants.categoryFOOD
+                        || thing.getCategory() == Constants.categoryPFOOD
+                        || thing.getCategory() == Constants.categoryNPFOOD)) 
+                    {                
+                      // Identifica qualquer tipo de comida
+                      food = thing;
+                      System.out.println("updateEnvironment: found food)");
+                    } else if (wall == null && (thing.getCategory() == Constants.categoryBRICK))
+                           {
+                              wall = thing;
+                              // FMT System.out.println("updateEnvironment: found wall)");
+                           }                               
+        }
+    }
+    
+   
+    @Override
+    public void processAction(Object action) {
+        String actionName = (String) action;
+        currentAction = actionName.substring(actionName.indexOf(".") + 1);
+    }
+
+    public String getLastAction()
+    {
+      return(sLastAction);    
+    }
+    
+    public void resetLastAction()
+    {
+      sLastAction = null;    
+    }
+    
+    private void performAction(String currentAction) 
+    {
+        WorldPoint currPoint;
+        sLastAction = currentAction;
+        try {
+            System.out.println("performAction: "+currentAction);
+            switch (currentAction) {
+                case "rotate":
+                    creature.rotate(1.0);
+                    //CommandUtility.sendSetTurn(creature.getIndex(), -1.0, -1.0, 3.0);
+                    break;
+                case "gotoFood":
+                    if (food != null) 
+                        creature.moveto(3.0, food.getX1(), food.getY1());
+                        //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, food.getX1(), food.getY1());
+                    break;
+                case "gotoJewel":
+                    if (leafletJewel != null)
+                        creature.moveto(3.0, leafletJewel.getX1(), leafletJewel.getY1());
+                        //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, leafletJewel.getX1(), leafletJewel.getY1());
+                    break;                    
+                case "get":
+                    creature.move(0.0, 0.0, 0.0);
+                    //CommandUtility.sendSetTurn(creature.getIndex(), 0.0, 0.0, 0.0);
+                    if (thingAhead != null) {
+                        for (Thing thing : thingAhead) {
+                            if (thing.getCategory() == Constants.categoryJEWEL) {
+                                creature.putInSack(thing.getName());
+                            } else if (thing.getCategory() == Constants.categoryFOOD || thing.getCategory() == Constants.categoryNPFOOD || thing.getCategory() == Constants.categoryPFOOD) {
+                                creature.eatIt(thing.getName());
+                            }
+                        }
+                    }
+                    this.resetState();
+                    break;
+                case "gotoDestination":
+                    creature.moveto(3.0, 450.0, 450.0);
+                        //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, leafletJewel.getX1(), leafletJewel.getY1());
+                    break;                    
+                case "moveAgent":
+                    currPoint = creature.getPosition();
+                    double angle = currPoint.getAngle();
+                    creature.moveto(3.0, currPoint.getX()+dCellSize, currPoint.getY()+dCellSize);
+                    break;                    
+                case "turnLeft":
+                    creature.rotate(3.0);
+                    creature.moveto(3.0, 450.0, 450.0);
+                    break;
+                case "turnRight":
+                    creature.rotate(3.0);
+                    creature.moveto(3.0, 450.0, 450.0);
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

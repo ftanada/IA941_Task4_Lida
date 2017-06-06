@@ -108,7 +108,11 @@ public class LidaActionPanel extends GuiPanelImpl
        if (this.environment != null)
        {
            sAux = this.environment.getLastAction();
-           setText(sAux);
+           if (sAux != null)
+           {
+               setText(sAux);
+               this.environment.resetLastAction();
+           }
        }
     }
 

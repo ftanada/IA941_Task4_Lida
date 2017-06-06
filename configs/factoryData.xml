@@ -130,6 +130,42 @@
             <associatedmodule>SensoryMemory</associatedmodule>
             <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
         </task>
+        <task name="EnergyDetector">
+            <class>detectors.EnergyDetector</class>
+            <ticksperrun>3</ticksperrun>
+            <associatedmodule>SensoryMemory</associatedmodule>
+            <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
+        </task>
+        <task name="ObjectDetector">
+            <class>detectors.ObjectDetector</class>
+            <ticksperrun>3</ticksperrun>
+            <associatedmodule>SensoryMemory</associatedmodule>
+            <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
+        </task>
+        <task name="OpenBottomDetector">
+            <class>detectors.OpenBottomDetector</class>
+            <ticksperrun>3</ticksperrun>
+            <associatedmodule>SensoryMemory</associatedmodule>
+            <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
+        </task>
+        <task name="OpenLefttDetector">
+            <class>detectors.OpenLefttDetector</class>
+            <ticksperrun>3</ticksperrun>
+            <associatedmodule>SensoryMemory</associatedmodule>
+            <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
+        </task>
+        <task name="OpenRightDetector">
+            <class>detectors.OpenRightDetector</class>
+            <ticksperrun>3</ticksperrun>
+            <associatedmodule>SensoryMemory</associatedmodule>
+            <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
+        </task>
+        <task name="OpenTopDetector">
+            <class>detectors.OpenTopDetector</class>
+            <ticksperrun>3</ticksperrun>
+            <associatedmodule>SensoryMemory</associatedmodule>
+            <associatedmodule>PerceptualAssociativeMemory</associatedmodule>
+        </task>
         <task name="WallDetector">
             <class>detectors.WallDetector</class>
             <ticksperrun>3</ticksperrun>
