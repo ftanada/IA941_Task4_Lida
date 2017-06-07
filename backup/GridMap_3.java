@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.xguzm.pathfinding.grid.GridCell;
 import org.xguzm.pathfinding.grid.NavigationGrid;
 import org.xguzm.pathfinding.grid.finders.AStarGridFinder;
+import org.xguzm.pathfinding.grid.finders.ThetaStarGridFinder;
 import org.xguzm.pathfinding.grid.finders.GridFinderOptions;
 import ws3dproxy.model.Thing;
 
@@ -17,22 +18,30 @@ import ws3dproxy.model.Thing;
  *
  * @author danilo
  */
-public class GridMap {
-    
+public class GridMap 
+{    
     private static int GRID_CELL_SIZE = 50;
+    private static GridFinderOptions opt = new GridFinderOptions();
+    private AStarGridFinder<GridCell> finder;
     
     private // 0 means closed, 1 means open, 2 is marker for start, 3 is marker for goal
-	int[][] navCells = new int[40][30];
+	int[][] navCells = new int[20][15];
     
     private int startX, startY, endX, endY;
     
-    public GridMap(double startX, double startY, double endX, double endY) {
+    public GridMap(double startX, double startY, double endX, double endY) 
+    {
         this(calcGridPosition(startX), calcGridPosition(startY), calcGridPosition(endX), calcGridPosition(endY));
+        finder = new AStarGridFinder(GridCell.class, opt);
     }
     
-    private GridMap(int startX, int startY, int endX, int endY)  {
-        for (int i = 0; i < navCells.length; i++) {
-            for (int k = 0; k < navCells[i].length; k++) {
+    private GridMap(int startX, int startY, int endX, int endY)  
+    {
+        finder = new AStarGridFinder(GridCell.class, opt);
+        for (int i = 0; i < navCells.length; i++) 
+        {
+            for (int k = 0; k < navCells[i].length; k++) 
+            {
                 navCells[i][k] = 1;
             }
         }
@@ -46,7 +55,7 @@ public class GridMap {
         this.endY = endY;
     }
     
-    private NavigationGrid<GridCell> getGridCellMap(int[][] navCells) {
+    private static NavigationGrid<GridCell> getGridCellMap(int[][] navCells) {
         GridCell[][] cells = new GridCell[navCells.length][navCells[0].length];
 
         for (int x = 0; x < navCells.length; x++) {
@@ -86,16 +95,19 @@ public class GridMap {
         }
     }
     
-    public synchronized List<Coordinate> findPath() {
+    public synchronized List<Coordinate> findPath() 
+    {
         //or create your own pathfinder options:
-        GridFinderOptions opt = new GridFinderOptions();
         opt.allowDiagonal = false;
 	
-        AStarGridFinder<GridCell> finder = new AStarGridFinder(GridCell.class, opt);
-        return finder.findPath(startX, startY, endX, endY, getGridCellMap(navCells)).stream()
+        if (finder != null)
+        {
+          return finder.findPath(startX, startY, endX, endY, getGridCellMap(navCells)).stream()
                 .map(gridCell -> new Coordinate(
                         calcCoordinate(gridCell.getX()), calcCoordinate(gridCell.getY())
                 )).collect(Collectors.toList());
+        }
+        return(null);
     }
     
     private double calcCoordinate(int pos) {

@@ -73,7 +73,7 @@ public class Environment extends EnvironmentImpl
         {
             System.out.println("Reseting the WS3D World ...");
             proxy.getWorld().reset();
-            creature = proxy.createCreature(80, 80, 0);
+            creature = proxy.createCreature(80, 110, 0);
             creature.start();
             System.out.println("Starting the WS3D Resource Generator ... ");
             // FMT World.grow(1);
@@ -81,25 +81,25 @@ public class Environment extends EnvironmentImpl
             // FMT 01/06/2017 Create Simulation Enviroment - walls
             // not works CommandUtility.sendNewBrick(4,119.0,5.0,142.0,199.0);
             // borders
-            CommandUtility.sendNewBrick(2, 795, 0, 800, 600);
-            CommandUtility.sendNewBrick(2, 0, 0, 800, 5);
-            CommandUtility.sendNewBrick(2, 0, 595, 800, 600);
-            CommandUtility.sendNewBrick(2, 0, 0, 5, 600);
+            CommandUtility.sendNewBrick(4, 0, 595, 800, 600);
+            /*CommandUtility.sendNewBrick(4, 795, 0, 800, 600);
+            CommandUtility.sendNewBrick(4, 0, 0, 800, 5);
+            CommandUtility.sendNewBrick(4, 0, 0, 5, 600);
             //maze
             // horizontal
-            CommandUtility.sendNewBrick(4,13.0,224.0,87.0,234.0);   
-            CommandUtility.sendNewBrick(4,107.0,306.0,228.0,334.0);   
-            CommandUtility.sendNewBrick(4,244.0,528.0,620.0,542.0);
-            CommandUtility.sendNewBrick(4,302.0,468.0,500.0,479.0);
-            CommandUtility.sendNewBrick(4,500.0,300.0,710.0,310.0);
+            CommandUtility.sendNewBrick(2,13.0,224.0,87.0,234.0);   
+            CommandUtility.sendNewBrick(2,107.0,306.0,228.0,334.0);   
+            CommandUtility.sendNewBrick(2,244.0,528.0,620.0,542.0);
+            CommandUtility.sendNewBrick(2,302.0,468.0,500.0,479.0);
+            CommandUtility.sendNewBrick(2,500.0,300.0,710.0,310.0);
             // vertical
-            CommandUtility.sendNewBrick(4,318.0,150.0,327.0,350.0);   
-            CommandUtility.sendNewBrick(4,700.0,20.0,710.0,480.0);   
+            CommandUtility.sendNewBrick(2,318.0,150.0,327.0,350.0);   
+            CommandUtility.sendNewBrick(2,700.0,20.0,710.0,480.0);   */
             
-            // FMT initial move
-            creature.start();
-            creature.moveto(3.0, 450, 450); 
-            creature.move(0, 0, 0);
+            World.createBrick(2,10.0,580.0,100.00,590.0);
+            World.createBrick(2,230.0,6.0,240.00,400.0);
+            World.createBrick(2,370.0,200.0,380.00,594.00);
+            World.createBrick(2,530.0,6.0,540.00,400.0);
             
             Thread.sleep(4000);
             creature.updateState();
@@ -123,8 +123,16 @@ public class Environment extends EnvironmentImpl
     }
 
     @Override
-    public void resetState() {
+    public void resetState() 
+    {
         currentAction = "gotoDestination";
+    }
+    
+    public void terminateState()
+    {
+       currentAction = "none";
+       System.out.println("DemoLIDA has finished its mission.");
+       System.exit(1);
     }
     
     @Override
@@ -357,11 +365,14 @@ public class Environment extends EnvironmentImpl
                 case "moveTop":
                 case "gotoDestination":
                   creature.updateState();
-                  gridMap.markStartPosition(creature.getPosition().getX(), creature.getPosition().getY());
+                  double currX = creature.getPosition().getX();
+                  double currY = creature.getPosition().getY();
+                  if ((currX > 750) && (currY < 50)) terminateState();
+                  gridMap.markStartPosition(currX, currY);
                   List<Coordinate> coordinates = gridMap.findPath();
                   if (coordinates != null && !coordinates.isEmpty()) try
                   {
-                    creature.moveto(1.0, coordinates.get(0).getX(), coordinates.get(0).getY());
+                    creature.moveto(1.5, coordinates.get(0).getX(), coordinates.get(0).getY());
                   } catch (Exception e) 
                     {
                       e.printStackTrace();
