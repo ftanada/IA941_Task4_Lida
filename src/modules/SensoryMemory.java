@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import ws3dproxy.model.Thing;
 
-public class SensoryMemory extends SensoryMemoryImpl {
-
+public class SensoryMemory extends SensoryMemoryImpl 
+{
     private Map<String, Object> sensorParam;
     private Thing food;
     private Thing jewel;
@@ -30,10 +30,10 @@ public class SensoryMemory extends SensoryMemoryImpl {
         this.thingAhead = new ArrayList<>();
         this.leafletJewel = null;
         this.genericThing = null;
-        openBottom = true;
-        openLeft = true;
-        openRight = true;
-        openTop = true;
+        openBottom = false;
+        openLeft = false;
+        openRight = false;
+        openTop = false;
     }
 
     @SuppressWarnings("unchecked")
@@ -54,7 +54,7 @@ public class SensoryMemory extends SensoryMemoryImpl {
         // FMT 01/06/2017
         sensorParam.clear();
         sensorParam.put("mode", "wall");
-        wall = (Thing) environment.getState(sensorParam);*/
+        wall = (Thing) environment.getState(sensorParam);
         sensorParam.put("mode", "openBottom");
         openBottom = (boolean) environment.getState(sensorParam);
         sensorParam.put("mode", "openRight");
@@ -64,8 +64,9 @@ public class SensoryMemory extends SensoryMemoryImpl {
         openLeft = (boolean) environment.getState(sensorParam);
         sensorParam.clear();
         sensorParam.put("mode", "openTop");
-        openTop = (boolean) environment.getState(sensorParam);
-        sensorParam.clear();
+        openTop = (boolean) environment.getState(sensorParam);*/
+        sensorParam.put("mode", "wall");
+        wall = (Thing) environment.getState(sensorParam);        
     }
 
     @Override
@@ -73,7 +74,8 @@ public class SensoryMemory extends SensoryMemoryImpl {
         Object requestedObject = null;
         String mode = (String) params.get("mode");
         // FMT System.out.println("getSensoryContent: "+mode);
-        switch (mode) {
+        switch (mode) 
+        {
             case "food":
                 requestedObject = food;
                 break;

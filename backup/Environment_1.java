@@ -59,7 +59,6 @@ public class Environment extends EnvironmentImpl
         this.wall = null;
         this.genericThing = null;
         this.currentAction = "gotoDestination";
-        this.gridMap = new GridMap(25, 25, 775, 25);
         this.sLastAction = "";
     }
 
@@ -361,7 +360,7 @@ public class Environment extends EnvironmentImpl
                   List<Coordinate> coordinates = gridMap.findPath();
                   if (coordinates != null && !coordinates.isEmpty()) try
                   {
-                    creature.moveto(1.0, coordinates.get(0).getX(), coordinates.get(0).getY());
+                    creature.moveto(0.5, coordinates.get(0).getX(), coordinates.get(0).getY());
                   } catch (Exception e) 
                     {
                       e.printStackTrace();

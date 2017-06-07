@@ -110,6 +110,7 @@ public class LidaActionPanel extends GuiPanelImpl
            sAux = this.environment.getLastAction();
            if (sAux != null)
            {
+               sAux = System.currentTimeMillis() + " " + sAux;
                setText(sAux);
                this.environment.resetLastAction();
            }

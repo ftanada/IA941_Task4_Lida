@@ -85,12 +85,14 @@ public class Environment extends EnvironmentImpl
             CommandUtility.sendNewBrick(2, 0, 595, 800, 600);
             CommandUtility.sendNewBrick(2, 0, 0, 5, 600);
             //maze
-            CommandUtility.sendNewBrick(4,244.0,528.0,620.0,542.0);
-            CommandUtility.sendNewBrick(4,302.0,468.0,469.0,479.0);
+            // horizontal
             CommandUtility.sendNewBrick(4,13.0,224.0,87.0,234.0);   
             CommandUtility.sendNewBrick(4,107.0,306.0,228.0,334.0);   
+            CommandUtility.sendNewBrick(4,244.0,528.0,620.0,542.0);
+            CommandUtility.sendNewBrick(4,302.0,468.0,500.0,479.0);
+            CommandUtility.sendNewBrick(4,500.0,300.0,710.0,310.0);
+            // vertical
             CommandUtility.sendNewBrick(4,318.0,150.0,327.0,350.0);   
-            CommandUtility.sendNewBrick(4,500.0,400.0,650.0,410.0);
             CommandUtility.sendNewBrick(4,700.0,20.0,710.0,480.0);   
             
             // FMT initial move
@@ -523,7 +525,7 @@ public class Environment extends EnvironmentImpl
                     break;
                 case "gotoFood":
                     if (food != null) 
-                        creature.moveto(3.0, food.getX1(), food.getY1());
+                        creature.moveto(1.5, food.getX1(), food.getY1());
                         //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, food.getX1(), food.getY1());
                     break;
                 case "gotoJewel":
@@ -546,7 +548,7 @@ public class Environment extends EnvironmentImpl
                     this.resetState();
                     break;
                 case "gotoDestination":
-                    creature.moveto(3.0, 450.0, 450.0);
+                    creature.moveto(1.5, 450.0, 450.0);
                         //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, leafletJewel.getX1(), leafletJewel.getY1());
                     break;                    
                 case "moveAgent":
@@ -555,26 +557,26 @@ public class Environment extends EnvironmentImpl
                     creature.moveto(3.0, currPoint.getX()+dCellSize, currPoint.getY()+dCellSize);
                     break;                    
                 case "turnLeft":
-                    creature.rotate(3.0);
+                    creature.rotate(1.5);
                     break;
                 case "turnRight":
-                    creature.rotate(3.0);
+                    creature.rotate(1.5);
                     break;
                 case "moveBottom":
-                    creature.moveto(2.0, creature.getPosition().getX(), creature.getPosition().getY()+5);                     
+                    creature.moveto(1.5, creature.getPosition().getX(), creature.getPosition().getY()+5);                     
                     break;
                 case "moveRight":
-                    creature.moveto(2.0, creature.getPosition().getX()+5, creature.getPosition().getY());
+                    creature.moveto(1.5, creature.getPosition().getX()+5, creature.getPosition().getY());
                     break;
                 case "moveLeft":
-                    creature.moveto(2.0, creature.getPosition().getX()-5, creature.getPosition().getY());
+                    creature.moveto(1.5, creature.getPosition().getX()-5, creature.getPosition().getY());
                     break;
                 case "moveTop":
-                    creature.moveto(2.0, creature.getPosition().getX(), creature.getPosition().getY()-5);
+                    creature.moveto(1.5, creature.getPosition().getX(), creature.getPosition().getY()-5);
                     //CommandUtility.sendGoTo(creature.getIndex(), 3.0, 3.0, creature.getPosition().getX(), creature.getPosition().getY()-5);
                     break;                    
                 default:
-                    creature.moveto(3.0, 450.0, 450.0);
+                    creature.moveto(1.5, 450.0, 450.0);
                     break;
             }
         } catch (Exception e) {
