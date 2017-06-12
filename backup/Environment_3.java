@@ -14,7 +14,6 @@ import ws3dproxy.model.Thing;
 import ws3dproxy.model.World;
 import ws3dproxy.model.WorldPoint;
 import ws3dproxy.util.Constants;
-import org.xguzm.pathfinding.grid.GridCell;
 
 public class Environment extends EnvironmentImpl 
 {
@@ -46,6 +45,7 @@ public class Environment extends EnvironmentImpl
     private int targetYCell = iYCells -2;
     private GridMap gridMap;
     private List<Thing> walls = new ArrayList<>();
+
     
     public Environment() 
     {
@@ -59,7 +59,7 @@ public class Environment extends EnvironmentImpl
         this.wall = null;
         this.genericThing = null;
         this.currentAction = "gotoDestination";
-        this.gridMap = new GridMap(1,1, 780, 10);
+        this.gridMap = new GridMap(25, 25, 775, 25);
         this.sLastAction = "";
     }
 
@@ -82,12 +82,12 @@ public class Environment extends EnvironmentImpl
             // not works CommandUtility.sendNewBrick(4,119.0,5.0,142.0,199.0);
             // borders
             CommandUtility.sendNewBrick(4, 0, 595, 800, 600);
-            //CommandUtility.sendNewBrick(4, 795, 0, 800, 600);
-            //CommandUtility.sendNewBrick(4, 0, 0, 800, 5);
-            //CommandUtility.sendNewBrick(4, 0, 0, 5, 600); 
+            /*CommandUtility.sendNewBrick(4, 795, 0, 800, 600);
+            CommandUtility.sendNewBrick(4, 0, 0, 800, 5);
+            CommandUtility.sendNewBrick(4, 0, 0, 5, 600);
             //maze
             // horizontal
-            /*CommandUtility.sendNewBrick(2,13.0,224.0,87.0,234.0);   
+            CommandUtility.sendNewBrick(2,13.0,224.0,87.0,234.0);   
             CommandUtility.sendNewBrick(2,107.0,306.0,228.0,334.0);   
             CommandUtility.sendNewBrick(2,244.0,528.0,620.0,542.0);
             CommandUtility.sendNewBrick(2,302.0,468.0,500.0,479.0);
@@ -98,12 +98,8 @@ public class Environment extends EnvironmentImpl
             
             World.createBrick(2,10.0,580.0,100.00,590.0);
             World.createBrick(2,230.0,6.0,240.00,400.0);
-            //World.createBrick(2,450.0,280.0,460.00,594.00);
-            World.createBrick(2,450.0,380.0,460.00,594.00);
-            //World.createBrick(2,630.0,6.0,640.00,400.0);
-            World.createBrick(2,630.0,6.0,640.00,370.0);
-            
-            World.createBrick(2,100.0,300.0,240.00,310.0);
+            World.createBrick(2,370.0,200.0,380.00,594.00);
+            World.createBrick(2,530.0,6.0,540.00,400.0);
             
             Thread.sleep(4000);
             creature.updateState();
@@ -136,13 +132,6 @@ public class Environment extends EnvironmentImpl
     {
        currentAction = "none";
        System.out.println("DemoLIDA has finished its mission.");
-       try 
-       { 
-          Thread.sleep(4000); 
-       } catch (Exception e) 
-                {
-                    e.printStackTrace();
-                }
        System.exit(1);
     }
     
@@ -380,7 +369,6 @@ public class Environment extends EnvironmentImpl
                   double currY = creature.getPosition().getY();
                   if ((currX > 750) && (currY < 50)) terminateState();
                   gridMap.markStartPosition(currX, currY);
-                  //List<GridCell> coordinates = gridMap.findPath();
                   List<Coordinate> coordinates = gridMap.findPath();
                   if (coordinates != null && !coordinates.isEmpty()) try
                   {
